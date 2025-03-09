@@ -29,15 +29,15 @@ const Hero = () => {
   }, []);
   
   return (
-    <section className="min-h-screen pt-32 pb-20 flex flex-col justify-center">
+    <section className="min-h-[60vh] pt-32 pb-10 flex flex-col justify-center">
       <div className="page-container">
         <div 
           ref={heroRef} 
           className="opacity-0 translate-y-10 transition-all duration-1000 ease-soft"
         >
-          <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight mb-12">
-            Timeless Design <br className="hidden md:block" />
-            <span className="font-light">Elegant Aesthetics</span>
+          <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight mb-8">
+            Design <br className="hidden md:block" />
+            <span className="font-light">Through Art</span>
           </h1>
         </div>
         
@@ -46,15 +46,15 @@ const Hero = () => {
           className="opacity-0 translate-y-10 transition-all duration-1000 delay-300 ease-soft max-w-2xl"
         >
           <p className="prose-content mb-8">
-            Hanan Bakri creates refined designs that balance form and function, 
-            crafting spaces and experiences that inspire and endure.
+            Hanan Bakri creates timeless designs that embody elegance 
+            and artistry, each piece crafted with meticulous attention to detail.
           </p>
           
           <Link 
             to="/projects" 
             className="inline-block py-3 px-6 border border-primary/20 hover:border-primary hover:bg-primary/5 transition-all duration-300"
           >
-            View Projects
+            Explore Collection
           </Link>
         </div>
       </div>

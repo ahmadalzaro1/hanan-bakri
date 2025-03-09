@@ -53,8 +53,12 @@
     @apply border-border;
   }
 
+  html {
+    @apply scroll-smooth;
+  }
+
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground font-sans overflow-x-hidden;
   }
 
   .page-container {
@@ -97,4 +101,40 @@
   .input-field {
     @apply w-full p-3 bg-secondary border-b border-primary/10 focus:border-primary/40 outline-none transition-all duration-300;
   }
+  
+  /* Enhanced animation classes */
+  .parallax-item {
+    @apply transition-all duration-700 ease-soft will-change-transform;
+  }
+  
+  .fade-in-up {
+    animation: fadeInUp 1s ease forwards;
+  }
+  
+  .fade-in-down {
+    animation: fadeInDown 1s ease forwards;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
+

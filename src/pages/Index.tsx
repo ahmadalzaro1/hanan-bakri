@@ -3,8 +3,8 @@ import React, { useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Hero from '@/components/home/Hero';
-import FeaturedProjects from '@/components/home/FeaturedProjects';
 import Philosophy from '@/components/home/Philosophy';
+import ParallaxGallery from '@/components/home/ParallaxGallery';
 
 const Index = () => {
   useEffect(() => {
@@ -20,7 +20,7 @@ const Index = () => {
       <Navigation />
       <main>
         <Hero />
-        <FeaturedProjects />
+        <ParallaxGallery />
         <Philosophy />
       </main>
       <Footer />
