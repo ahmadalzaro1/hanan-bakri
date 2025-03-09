@@ -1,12 +1,15 @@
 
 import React, { useState, useRef } from 'react';
 import { useGallery } from '@/contexts/GalleryContext';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
-import { Upload, Loader2, Sparkles, EyeIcon } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { analyzeImages } from '@/lib/imageAnalysis';
+
+import FileUploader from './batch-uploader/FileUploader';
+import ImagePreviewGrid from './batch-uploader/ImagePreviewGrid';
+import ProgressIndicator from './batch-uploader/ProgressIndicator';
+import GalleryPreview from './batch-uploader/GalleryPreview';
 
 const BatchUploader = () => {
   const { addImage, images } = useGallery();
@@ -122,93 +125,6 @@ const BatchUploader = () => {
     }
   };
 
-  // Preview gallery component
-  const GalleryPreview = () => {
-    if (!showPreview || previewColumns.length === 0) return null;
-
-    // Organize images by column
-    const columnImages = {
-      1: [] as { url: string, index: number }[],
-      2: [] as { url: string, index: number }[],
-      3: [] as { url: string, index: number }[]
-    };
-
-    previewUrls.forEach((url, index) => {
-      const column = previewColumns[index];
-      if (column) {
-        columnImages[column].push({ url, index });
-      }
-    });
-
-    return (
-      <div className="mt-8 border rounded-lg p-4">
-        <h3 className="text-lg font-medium mb-4 flex items-center">
-          <EyeIcon className="mr-2 h-5 w-5 text-primary" />
-          Preview: How Images Will Look on Homepage
-        </h3>
-        
-        <div className="grid grid-cols-3 gap-2">
-          {/* Column 1 */}
-          <div className="space-y-2">
-            <p className="text-sm text-center text-muted-foreground mb-2">Column 1 (Left)</p>
-            {columnImages[1].map(({ url, index }) => (
-              <div key={`preview-1-${index}`} className="rounded overflow-hidden">
-                <img 
-                  src={url} 
-                  alt={`Preview ${index}`} 
-                  className="w-full h-[200px] object-cover"
-                />
-              </div>
-            ))}
-            {columnImages[1].length === 0 && (
-              <p className="text-sm text-center text-muted-foreground p-4 border border-dashed rounded">No images</p>
-            )}
-          </div>
-          
-          {/* Column 2 */}
-          <div className="space-y-2">
-            <p className="text-sm text-center text-muted-foreground mb-2">Column 2 (Middle)</p>
-            {columnImages[2].map(({ url, index }) => (
-              <div key={`preview-2-${index}`} className="rounded overflow-hidden">
-                <img 
-                  src={url} 
-                  alt={`Preview ${index}`} 
-                  className="w-full h-[200px] object-cover"
-                />
-              </div>
-            ))}
-            {columnImages[2].length === 0 && (
-              <p className="text-sm text-center text-muted-foreground p-4 border border-dashed rounded">No images</p>
-            )}
-          </div>
-          
-          {/* Column 3 */}
-          <div className="space-y-2">
-            <p className="text-sm text-center text-muted-foreground mb-2">Column 3 (Right)</p>
-            {columnImages[3].map(({ url, index }) => (
-              <div key={`preview-3-${index}`} className="rounded overflow-hidden">
-                <img 
-                  src={url} 
-                  alt={`Preview ${index}`} 
-                  className="w-full h-[200px] object-cover"
-                />
-              </div>
-            ))}
-            {columnImages[3].length === 0 && (
-              <p className="text-sm text-center text-muted-foreground p-4 border border-dashed rounded">No images</p>
-            )}
-          </div>
-        </div>
-        
-        <div className="mt-4 flex justify-between items-center">
-          <p className="text-sm text-muted-foreground">
-            Column distribution: Left ({columnImages[1].length}), Middle ({columnImages[2].length}), Right ({columnImages[3].length})
-          </p>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="space-y-6">
       <Card>
@@ -224,107 +140,48 @@ const BatchUploader = () => {
             determine the best column placement based on image content and aesthetics.
           </p>
           
-          <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center hover:border-primary/50 transition-colors">
-            <input
-              type="file"
-              ref={fileInputRef}
-              multiple
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-              id="batch-file-upload"
-            />
-            <label 
-              htmlFor="batch-file-upload"
-              className="flex flex-col items-center justify-center cursor-pointer"
-            >
-              <Upload size={40} className="text-muted-foreground mb-3" />
-              <span className="text-lg font-medium">Drag files here or click to browse</span>
-              <span className="text-sm text-muted-foreground mt-1">
-                Support for JPG, PNG and WebP up to 5MB
-              </span>
-            </label>
-          </div>
+          <FileUploader 
+            onFileChange={handleFileChange}
+            selectedFilesCount={selectedFiles.length}
+            onClearSelection={clearSelection}
+          />
           
-          {selectedFiles.length > 0 && (
-            <div className="mt-6 space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium">Selected Images ({selectedFiles.length})</h3>
-                <Button variant="outline" size="sm" onClick={clearSelection}>
-                  Clear All
-                </Button>
-              </div>
-              
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 max-h-[250px] overflow-y-auto p-2">
-                {previewUrls.map((url, index) => (
-                  <div key={`file-${index}`} className="relative aspect-[3/4] rounded-md overflow-hidden group">
-                    <img 
-                      src={url} 
-                      alt={`Preview ${index + 1}`}
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-sm p-2 text-center">
-                      {selectedFiles[index]?.name}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <ImagePreviewGrid 
+            previewUrls={previewUrls}
+            selectedFiles={selectedFiles}
+          />
           
           {isProcessing && (
-            <div className="mt-4 space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-sm">{showPreview ? 'Uploading images...' : 'Analyzing images...'}</span>
-                <span className="text-sm font-medium">{progress}%</span>
-              </div>
-              <Progress value={progress} className="h-2" />
+            <div className="mt-4">
+              <ProgressIndicator 
+                isProcessing={isProcessing}
+                progress={progress}
+                showPreview={showPreview}
+                selectedFilesLength={selectedFiles.length}
+                onAnalyzeAndPreview={analyzeAndPreview}
+                onProcessUpload={processUpload}
+              />
             </div>
           )}
         </CardContent>
         <CardFooter className="flex flex-col space-y-3">
-          {!showPreview ? (
-            <Button 
-              onClick={analyzeAndPreview}
-              disabled={isProcessing || selectedFiles.length === 0}
-              className="w-full"
-            >
-              {isProcessing ? (
-                <>
-                  <Loader2 size={16} className="mr-2 animate-spin" />
-                  Analyzing...
-                </>
-              ) : (
-                <>
-                  <Sparkles size={16} className="mr-2" />
-                  Analyze Images
-                </>
-              )}
-            </Button>
-          ) : (
-            <Button 
-              onClick={processUpload}
-              disabled={isProcessing}
-              className="w-full"
-            >
-              {isProcessing ? (
-                <>
-                  <Loader2 size={16} className="mr-2 animate-spin" />
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <Upload size={16} className="mr-2" />
-                  Confirm & Upload Images
-                </>
-              )}
-            </Button>
-          )}
+          <ProgressIndicator 
+            isProcessing={isProcessing}
+            progress={progress}
+            showPreview={showPreview}
+            selectedFilesLength={selectedFiles.length}
+            onAnalyzeAndPreview={analyzeAndPreview}
+            onProcessUpload={processUpload}
+          />
         </CardFooter>
       </Card>
 
       {/* Render the preview component */}
-      {showPreview && <GalleryPreview />}
+      <GalleryPreview 
+        showPreview={showPreview}
+        previewColumns={previewColumns}
+        previewUrls={previewUrls}
+      />
     </div>
   );
 };
