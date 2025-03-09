@@ -1,5 +1,8 @@
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
+
+import React, { useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
 
 const NotFound = () => {
   const location = useLocation();
@@ -9,18 +12,30 @@ const NotFound = () => {
       "404 Error: User attempted to access non-existent route:",
       location.pathname
     );
+    
+    // Update document title
+    document.title = '404 Not Found | Hanan Bakri';
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-xl text-gray-600 mb-4">Oops! Page not found</p>
-        <a href="/" className="text-blue-500 hover:text-blue-700 underline">
-          Return to Home
-        </a>
-      </div>
-    </div>
+    <>
+      <Navigation />
+      <main className="min-h-screen flex items-center justify-center py-32">
+        <div className="text-center px-4">
+          <h1 className="text-7xl md:text-9xl font-serif mb-6">404</h1>
+          <p className="text-xl md:text-2xl mb-8 max-w-md mx-auto">
+            The page you're looking for doesn't exist or has been moved.
+          </p>
+          <Link 
+            to="/" 
+            className="inline-block py-3 px-8 border border-primary/20 hover:border-primary hover:bg-primary/5 transition-all duration-300"
+          >
+            Return Home
+          </Link>
+        </div>
+      </main>
+      <Footer />
+    </>
   );
 };
 
