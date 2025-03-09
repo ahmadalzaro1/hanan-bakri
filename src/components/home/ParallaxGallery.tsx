@@ -56,7 +56,7 @@ const ParallaxGallery = () => {
           style={{ transform: `translateY(${-scrollY * 0.1}px)` }}
         >
           {column1Images.map((image) => (
-            <div key={image.id} className="mb-1 overflow-hidden">
+            <div key={`column1-${image.id}`} className="mb-1 overflow-hidden">
               <img
                 src={image.src}
                 alt={image.alt}
@@ -73,7 +73,7 @@ const ParallaxGallery = () => {
           style={{ transform: `translateY(${scrollY * 0.1}px)` }}
         >
           {column2Images.map((image) => (
-            <div key={image.id} className="mb-1 overflow-hidden">
+            <div key={`column2-${image.id}`} className="mb-1 overflow-hidden">
               <img
                 src={image.src}
                 alt={image.alt}
@@ -90,7 +90,7 @@ const ParallaxGallery = () => {
           style={{ transform: `translateY(${-scrollY * 0.1}px)` }}
         >
           {column3Images.map((image) => (
-            <div key={image.id} className="mb-1 overflow-hidden">
+            <div key={`column3-${image.id}`} className="mb-1 overflow-hidden">
               <img
                 src={image.src}
                 alt={image.alt}

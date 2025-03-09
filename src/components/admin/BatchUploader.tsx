@@ -4,9 +4,8 @@ import { useGallery } from '@/contexts/GalleryContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Upload, Image as ImageIcon, Loader2, Sparkles, EyeIcon } from 'lucide-react';
+import { Upload, Loader2, Sparkles, EyeIcon } from 'lucide-react';
 import { analyzeImages } from '@/lib/imageAnalysis';
 
 const BatchUploader = () => {
@@ -86,11 +85,15 @@ const BatchUploader = () => {
         // Create object URL for the image
         const imageUrl = URL.createObjectURL(file);
         
-        // Add to gallery
+        // Calculate proper ordering
+        const existingInColumn = images.filter(img => img.column === column).length;
+        
+        // Add to gallery with specific column and order
         addImage({
           src: imageUrl,
           alt: file.name.replace(/\.[^/.]+$/, ""), // Use filename without extension as alt text
-          column: column
+          column: column,
+          order: existingInColumn
         });
         
         // Update progress
@@ -98,6 +101,7 @@ const BatchUploader = () => {
       }
       
       toast.success(`Successfully uploaded ${selectedFiles.length} images`);
+      toast.info('Images added to homepage - click "Home" to view');
       clearSelection();
     } catch (error) {
       console.error('Error in batch upload:', error);
@@ -128,50 +132,68 @@ const BatchUploader = () => {
 
     return (
       <div className="mt-8 border rounded-lg p-4">
-        <h3 className="text-lg font-medium mb-4">Preview: How Images Will Look on Homepage</h3>
+        <h3 className="text-lg font-medium mb-4 flex items-center">
+          <EyeIcon className="mr-2 h-5 w-5 text-primary" />
+          Preview: How Images Will Look on Homepage
+        </h3>
         
         <div className="grid grid-cols-3 gap-2">
           {/* Column 1 */}
           <div className="space-y-2">
             <p className="text-sm text-center text-muted-foreground mb-2">Column 1 (Left)</p>
             {columnImages[1].map(({ url, index }) => (
-              <div key={index} className="rounded overflow-hidden">
+              <div key={`preview-1-${index}`} className="rounded overflow-hidden">
                 <img 
                   src={url} 
                   alt={`Preview ${index}`} 
-                  className="w-full h-auto object-cover"
+                  className="w-full h-[200px] object-cover"
                 />
               </div>
             ))}
+            {columnImages[1].length === 0 && (
+              <p className="text-sm text-center text-muted-foreground p-4 border border-dashed rounded">No images</p>
+            )}
           </div>
           
           {/* Column 2 */}
           <div className="space-y-2">
             <p className="text-sm text-center text-muted-foreground mb-2">Column 2 (Middle)</p>
             {columnImages[2].map(({ url, index }) => (
-              <div key={index} className="rounded overflow-hidden">
+              <div key={`preview-2-${index}`} className="rounded overflow-hidden">
                 <img 
                   src={url} 
                   alt={`Preview ${index}`} 
-                  className="w-full h-auto object-cover"
+                  className="w-full h-[200px] object-cover"
                 />
               </div>
             ))}
+            {columnImages[2].length === 0 && (
+              <p className="text-sm text-center text-muted-foreground p-4 border border-dashed rounded">No images</p>
+            )}
           </div>
           
           {/* Column 3 */}
           <div className="space-y-2">
             <p className="text-sm text-center text-muted-foreground mb-2">Column 3 (Right)</p>
             {columnImages[3].map(({ url, index }) => (
-              <div key={index} className="rounded overflow-hidden">
+              <div key={`preview-3-${index}`} className="rounded overflow-hidden">
                 <img 
                   src={url} 
                   alt={`Preview ${index}`} 
-                  className="w-full h-auto object-cover"
+                  className="w-full h-[200px] object-cover"
                 />
               </div>
             ))}
+            {columnImages[3].length === 0 && (
+              <p className="text-sm text-center text-muted-foreground p-4 border border-dashed rounded">No images</p>
+            )}
           </div>
+        </div>
+        
+        <div className="mt-4 flex justify-between items-center">
+          <p className="text-sm text-muted-foreground">
+            Column distribution: Left ({columnImages[1].length}), Middle ({columnImages[2].length}), Right ({columnImages[3].length})
+          </p>
         </div>
       </div>
     );
@@ -225,13 +247,13 @@ const BatchUploader = () => {
               
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 max-h-[250px] overflow-y-auto p-2">
                 {previewUrls.map((url, index) => (
-                  <div key={index} className="relative aspect-[3/4] rounded-md overflow-hidden group">
+                  <div key={`file-${index}`} className="relative aspect-[3/4] rounded-md overflow-hidden group">
                     <img 
                       src={url} 
                       alt={`Preview ${index + 1}`}
                       className="absolute inset-0 w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-sm">
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-sm p-2 text-center">
                       {selectedFiles[index]?.name}
                     </div>
                   </div>
