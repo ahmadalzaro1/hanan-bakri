@@ -8,66 +8,108 @@
 export const analyzeImages = async (files: File[]): Promise<(1 | 2 | 3)[]> => {
   const results: (1 | 2 | 3)[] = [];
   
-  for (const file of files) {
-    // Create image element to analyze
-    const imageData = await loadImageData(file);
+  // First pass: analyze each image individually
+  const imageAnalysisData = await Promise.all(
+    files.map(async (file) => {
+      // Create image element to analyze
+      const imageData = await loadImageData(file);
+      
+      // Analyze aspect ratio and brightness
+      const aspectRatio = imageData.width / imageData.height;
+      const brightness = await calculateBrightness(imageData);
+      
+      return {
+        file,
+        aspectRatio,
+        brightness,
+        size: file.size,
+      };
+    })
+  );
+  
+  // Perform initial column assignments
+  for (const data of imageAnalysisData) {
+    let column: 1 | 2 | 3;
     
-    // Analyze aspect ratio and brightness
-    const aspectRatio = imageData.width / imageData.height;
-    const brightness = await calculateBrightness(imageData);
-    
-    // Simple algorithm to distribute images:
-    // - Wide images (landscape orientation) tend to go in middle column (2)
-    // - Bright images tend to go in columns 1 and 3
-    // - Dark images tend to go in column 2
-    // - Also add some variety by using the image size
-    
-    if (aspectRatio > 1.2) {
-      // Wide image - put in middle column
-      results.push(2);
-    } else if (brightness > 150) {
-      // Bright image - alternate between columns 1 and 3
-      results.push(results.length % 2 === 0 ? 1 : 3);
-    } else if (brightness < 80) {
-      // Dark image - mostly in column 2
-      results.push(2);
-    } else {
-      // Distribute remaining images evenly
-      const column = (results.length % 3 + 1) as 1 | 2 | 3;
-      results.push(column);
+    // Wide landscape images often work best in the middle column
+    if (data.aspectRatio > 1.2) {
+      column = 2;
+    } 
+    // Very bright images tend to work well in columns 1 and 3
+    else if (data.brightness > 150) {
+      column = results.filter(col => col === 1).length <= 
+              results.filter(col => col === 3).length ? 1 : 3;
+    } 
+    // Dark, moody images often look good in the middle column
+    else if (data.brightness < 80) {
+      column = 2;
+    } 
+    // For other images, distribute them evenly
+    else {
+      // Count existing column assignments
+      const col1Count = results.filter(col => col === 1).length;
+      const col2Count = results.filter(col => col === 2).length;
+      const col3Count = results.filter(col => col === 3).length;
+      
+      // Place in the column with fewest images
+      if (col1Count <= col2Count && col1Count <= col3Count) {
+        column = 1;
+      } else if (col2Count <= col1Count && col2Count <= col3Count) {
+        column = 2;
+      } else {
+        column = 3;
+      }
     }
+    
+    results.push(column);
   }
   
-  // Balance columns by adjusting some assignments
+  // Balance columns if there's a significant imbalance
   const columnCounts = [0, 0, 0]; // indices 0, 1, 2 for columns 1, 2, 3
   results.forEach(column => columnCounts[column - 1]++);
   
-  // Normalize distribution if there's a significant imbalance
   const maxCount = Math.max(...columnCounts);
   const minCount = Math.min(...columnCounts);
   
-  if (maxCount - minCount > 2 && files.length > 5) {
+  // Only rebalance if there's a significant difference and we have enough images
+  if (maxCount - minCount > 2 && files.length >= 6) {
     // Find which column has too many and which has too few
-    const overloadedColumn = columnCounts.indexOf(maxCount) + 1 as 1 | 2 | 3;
-    const underfilledColumn = columnCounts.indexOf(minCount) + 1 as 1 | 2 | 3;
+    const overloadedColumnIndex = columnCounts.indexOf(maxCount);
+    const underfilledColumnIndex = columnCounts.indexOf(minCount);
     
-    // Redistribute some images
-    for (let i = 0; i < results.length && (maxCount - minCount > 2); i++) {
+    // Convert to 1-based column numbers
+    const overloadedColumn = (overloadedColumnIndex + 1) as 1 | 2 | 3;
+    const underfilledColumn = (underfilledColumnIndex + 1) as 1 | 2 | 3;
+    
+    // Look through results and find candidates to move
+    for (let i = 0; i < results.length; i++) {
       if (results[i] === overloadedColumn) {
-        results[i] = underfilledColumn;
-        columnCounts[overloadedColumn - 1]--;
-        columnCounts[underfilledColumn - 1]++;
-        // Recalculate max and min
-        const newMaxCount = Math.max(...columnCounts);
-        const newMinCount = Math.min(...columnCounts);
+        // Don't move images that strongly prefer their current column
+        const imageData = imageAnalysisData[i];
         
-        // Update our tracking values
-        if (newMaxCount !== maxCount || newMinCount !== minCount) {
-          break; // We've made enough adjustments
+        // Skip very wide images in column 2 or bright images in outer columns
+        if ((overloadedColumn === 2 && imageData.aspectRatio > 1.3) ||
+            ((overloadedColumn === 1 || overloadedColumn === 3) && imageData.brightness > 170)) {
+          continue;
+        }
+        
+        // Move this image to the underfilled column
+        results[i] = underfilledColumn;
+        
+        // Update our counts
+        columnCounts[overloadedColumnIndex]--;
+        columnCounts[underfilledColumnIndex]++;
+        
+        // Stop if we've balanced enough
+        if (columnCounts[overloadedColumnIndex] - columnCounts[underfilledColumnIndex] <= 1) {
+          break;
         }
       }
     }
   }
+  
+  // Add a delay to simulate complex analysis and show the progress bar
+  await new Promise(resolve => setTimeout(resolve, 1500));
   
   return results;
 };

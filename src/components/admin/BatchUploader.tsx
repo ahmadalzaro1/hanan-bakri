@@ -6,15 +6,17 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Upload, Image as ImageIcon, Loader2, Sparkles } from 'lucide-react';
+import { Upload, Image as ImageIcon, Loader2, Sparkles, EyeIcon } from 'lucide-react';
 import { analyzeImages } from '@/lib/imageAnalysis';
 
 const BatchUploader = () => {
-  const { addImage } = useGallery();
+  const { addImage, images } = useGallery();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewColumns, setPreviewColumns] = useState<(1 | 2 | 3)[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,14 +35,42 @@ const BatchUploader = () => {
     previewUrls.forEach(url => URL.revokeObjectURL(url));
     setSelectedFiles([]);
     setPreviewUrls([]);
+    setShowPreview(false);
+    setPreviewColumns([]);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
-  const processUpload = async () => {
+  const analyzeAndPreview = async () => {
     if (selectedFiles.length === 0) {
       toast.error('Please select files to upload');
+      return;
+    }
+
+    setIsProcessing(true);
+    setProgress(10);
+
+    try {
+      // Analyze images and get column assignments
+      const analysisResult = await analyzeImages(selectedFiles);
+      setPreviewColumns(analysisResult);
+      setProgress(100);
+      
+      // Show preview
+      setShowPreview(true);
+      toast.success('Analysis complete! Review the preview below.');
+    } catch (error) {
+      console.error('Error analyzing images:', error);
+      toast.error('Failed to analyze images');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const processUpload = async () => {
+    if (selectedFiles.length === 0 || previewColumns.length === 0) {
+      toast.error('Please analyze images before uploading');
       return;
     }
 
@@ -48,13 +78,10 @@ const BatchUploader = () => {
     setProgress(0);
 
     try {
-      // Analyze images and get column assignments
-      const analysisResult = await analyzeImages(selectedFiles);
-      
       // Upload each image with its analyzed column
       for (let i = 0; i < selectedFiles.length; i++) {
         const file = selectedFiles[i];
-        const column = analysisResult[i];
+        const column = previewColumns[i];
         
         // Create object URL for the image
         const imageUrl = URL.createObjectURL(file);
@@ -79,6 +106,75 @@ const BatchUploader = () => {
       setIsProcessing(false);
       setProgress(0);
     }
+  };
+
+  // Preview gallery component
+  const GalleryPreview = () => {
+    if (!showPreview || previewColumns.length === 0) return null;
+
+    // Organize images by column
+    const columnImages = {
+      1: [] as { url: string, index: number }[],
+      2: [] as { url: string, index: number }[],
+      3: [] as { url: string, index: number }[]
+    };
+
+    previewUrls.forEach((url, index) => {
+      const column = previewColumns[index];
+      if (column) {
+        columnImages[column].push({ url, index });
+      }
+    });
+
+    return (
+      <div className="mt-8 border rounded-lg p-4">
+        <h3 className="text-lg font-medium mb-4">Preview: How Images Will Look on Homepage</h3>
+        
+        <div className="grid grid-cols-3 gap-2">
+          {/* Column 1 */}
+          <div className="space-y-2">
+            <p className="text-sm text-center text-muted-foreground mb-2">Column 1 (Left)</p>
+            {columnImages[1].map(({ url, index }) => (
+              <div key={index} className="rounded overflow-hidden">
+                <img 
+                  src={url} 
+                  alt={`Preview ${index}`} 
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            ))}
+          </div>
+          
+          {/* Column 2 */}
+          <div className="space-y-2">
+            <p className="text-sm text-center text-muted-foreground mb-2">Column 2 (Middle)</p>
+            {columnImages[2].map(({ url, index }) => (
+              <div key={index} className="rounded overflow-hidden">
+                <img 
+                  src={url} 
+                  alt={`Preview ${index}`} 
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            ))}
+          </div>
+          
+          {/* Column 3 */}
+          <div className="space-y-2">
+            <p className="text-sm text-center text-muted-foreground mb-2">Column 3 (Right)</p>
+            {columnImages[3].map(({ url, index }) => (
+              <div key={index} className="rounded overflow-hidden">
+                <img 
+                  src={url} 
+                  alt={`Preview ${index}`} 
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -127,7 +223,7 @@ const BatchUploader = () => {
                 </Button>
               </div>
               
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 max-h-[400px] overflow-y-auto p-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 max-h-[250px] overflow-y-auto p-2">
                 {previewUrls.map((url, index) => (
                   <div key={index} className="relative aspect-[3/4] rounded-md overflow-hidden group">
                     <img 
@@ -147,33 +243,56 @@ const BatchUploader = () => {
           {isProcessing && (
             <div className="mt-4 space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm">Processing images...</span>
+                <span className="text-sm">{showPreview ? 'Uploading images...' : 'Analyzing images...'}</span>
                 <span className="text-sm font-medium">{progress}%</span>
               </div>
               <Progress value={progress} className="h-2" />
             </div>
           )}
         </CardContent>
-        <CardFooter>
-          <Button 
-            onClick={processUpload}
-            disabled={isProcessing || selectedFiles.length === 0}
-            className="w-full"
-          >
-            {isProcessing ? (
-              <>
-                <Loader2 size={16} className="mr-2 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              <>
-                <Sparkles size={16} className="mr-2" />
-                Analyze and Upload Images
-              </>
-            )}
-          </Button>
+        <CardFooter className="flex flex-col space-y-3">
+          {!showPreview ? (
+            <Button 
+              onClick={analyzeAndPreview}
+              disabled={isProcessing || selectedFiles.length === 0}
+              className="w-full"
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 size={16} className="mr-2 animate-spin" />
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <Sparkles size={16} className="mr-2" />
+                  Analyze Images
+                </>
+              )}
+            </Button>
+          ) : (
+            <Button 
+              onClick={processUpload}
+              disabled={isProcessing}
+              className="w-full"
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 size={16} className="mr-2 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Upload size={16} className="mr-2" />
+                  Confirm & Upload Images
+                </>
+              )}
+            </Button>
+          )}
         </CardFooter>
       </Card>
+
+      {/* Render the preview component */}
+      {showPreview && <GalleryPreview />}
     </div>
   );
 };
