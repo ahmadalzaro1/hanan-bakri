@@ -1,139 +1,121 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import { useAdmin } from '@/contexts/AdminContext';
+import { LogOut } from 'lucide-react';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import { ModeToggle } from '@/components/ModeToggle';
+import { Menu } from 'lucide-react';
+import { Button } from './ui/button';
 
 const Navigation = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-  
+  const { isAuthenticated, logout } = useAdmin();
+  const [isMobile, setIsMobile] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
     };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
+  const navItems = [
+    { path: '/', label: 'Home' },
+    { path: '/projects', label: 'Projects' },
+    { path: '/about', label: 'About' },
+    { path: '/contact', label: 'Contact' },
+  ];
+
   return (
-    <header 
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-soft py-6 px-4 sm:px-6 lg:px-8",
-        isScrolled ? "bg-background/90 backdrop-blur-sm py-4 shadow-sm" : "bg-transparent"
-      )}
-    >
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link to="/" className="font-serif text-xl tracking-wide">
+    <header className="fixed top-0 left-0 w-full bg-background/90 backdrop-blur-md z-50 border-b border-border">
+      <div className="page-container py-4 flex items-center justify-between">
+        <Link to="/" className="font-serif text-2xl font-bold">
           Hanan Bakri
         </Link>
-        
-        <nav className="hidden md:flex items-center space-x-10">
-          <Link 
-            to="/" 
-            className={cn("nav-link", location.pathname === "/" && "active")}
-          >
-            Home
-          </Link>
-          <Link 
-            to="/projects" 
-            className={cn("nav-link", location.pathname.includes("/projects") && "active")}
-          >
-            Projects
-          </Link>
-          <Link 
-            to="/about" 
-            className={cn("nav-link", location.pathname === "/about" && "active")}
-          >
-            About
-          </Link>
-          <Link 
-            to="/contact" 
-            className={cn("nav-link", location.pathname === "/contact" && "active")}
-          >
-            Contact
-          </Link>
-        </nav>
-        
-        <div className="md:hidden">
-          <MobileMenu location={location} />
-        </div>
+
+        {isMobile ? (
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" onClick={toggleMenu}>
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="sm:w-64 p-6">
+              <SheetHeader className="text-left mb-6">
+                <SheetTitle>Menu</SheetTitle>
+                <SheetDescription>
+                  Navigate through the website.
+                </SheetDescription>
+              </SheetHeader>
+              <div className="flex flex-col space-y-4">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`block py-2 text-lg transition-colors hover:text-primary ${location.pathname === item.path ? 'text-primary font-medium' : 'text-foreground'}`}
+                    onClick={closeMenu}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                {isAuthenticated && (
+                  <Button variant="ghost" className="justify-start" onClick={logout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </Button>
+                )}
+                <ModeToggle />
+              </div>
+            </SheetContent>
+          </Sheet>
+        ) : (
+          <nav className="flex items-center space-x-6">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`text-sm font-medium transition-colors hover:text-primary ${location.pathname === item.path ? 'text-primary' : 'text-foreground/80'}`}
+              >
+                {item.label}
+              </Link>
+            ))}
+            {isAuthenticated ? (
+              <Button variant="ghost" size="sm" onClick={logout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
+            ) : (
+              <Link to="/admin">
+                <Button variant="outline" size="sm">
+                  Admin Login
+                </Button>
+              </Link>
+            )}
+            <ModeToggle />
+          </nav>
+        )}
       </div>
     </header>
-  );
-};
-
-const MobileMenu = ({ location }: { location: ReturnType<typeof useLocation> }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  
-  return (
-    <div>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center w-10 h-10"
-        aria-label="Toggle menu"
-      >
-        <span className={cn(
-          "block w-5 relative transition-all duration-300 ease-soft",
-          isOpen ? "h-0" : "h-px bg-foreground"
-        )}>
-          <span className={cn(
-            "block absolute w-5 h-px bg-foreground transition-all duration-300 ease-soft",
-            isOpen ? "rotate-45 top-0" : "-translate-y-1.5"
-          )} />
-          <span className={cn(
-            "block absolute w-5 h-px bg-foreground transition-all duration-300 ease-soft",
-            isOpen ? "-rotate-45 top-0" : "translate-y-1.5"
-          )} />
-        </span>
-      </button>
-      
-      {isOpen && (
-        <div className="fixed inset-0 z-50 bg-background flex flex-col justify-center items-center">
-          <button
-            onClick={() => setIsOpen(false)}
-            className="absolute top-6 right-4 w-10 h-10 flex items-center justify-center"
-            aria-label="Close menu"
-          >
-            <span className="block w-5 h-0 relative">
-              <span className="block absolute w-5 h-px bg-foreground rotate-45" />
-              <span className="block absolute w-5 h-px bg-foreground -rotate-45" />
-            </span>
-          </button>
-          
-          <nav className="flex flex-col items-center space-y-8">
-            <Link 
-              to="/" 
-              className={cn("nav-link text-2xl", location.pathname === "/" && "active")}
-              onClick={() => setIsOpen(false)}
-            >
-              Home
-            </Link>
-            <Link 
-              to="/projects" 
-              className={cn("nav-link text-2xl", location.pathname.includes("/projects") && "active")}
-              onClick={() => setIsOpen(false)}
-            >
-              Projects
-            </Link>
-            <Link 
-              to="/about" 
-              className={cn("nav-link text-2xl", location.pathname === "/about" && "active")}
-              onClick={() => setIsOpen(false)}
-            >
-              About
-            </Link>
-            <Link 
-              to="/contact" 
-              className={cn("nav-link text-2xl", location.pathname === "/contact" && "active")}
-              onClick={() => setIsOpen(false)}
-            >
-              Contact
-            </Link>
-          </nav>
-        </div>
-      )}
-    </div>
   );
 };
 
