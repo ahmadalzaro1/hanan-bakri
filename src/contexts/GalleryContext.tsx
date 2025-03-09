@@ -103,12 +103,15 @@ export const GalleryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const savedImages = localStorage.getItem('gallery_images');
     if (savedImages) {
       try {
-        setImages(JSON.parse(savedImages));
+        const parsedImages = JSON.parse(savedImages);
+        console.log('Loaded images from localStorage:', parsedImages.length);
+        setImages(parsedImages);
       } catch (e) {
         console.error('Failed to parse saved images', e);
         setImages(initialImages);
       }
     } else {
+      console.log('No saved images found, using initial images');
       setImages(initialImages);
     }
   }, []);
@@ -116,6 +119,7 @@ export const GalleryProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Save images to localStorage whenever they change
   useEffect(() => {
     if (images.length > 0) {
+      console.log('Saving images to localStorage:', images.length);
       localStorage.setItem('gallery_images', JSON.stringify(images));
     }
   }, [images]);
@@ -127,11 +131,13 @@ export const GalleryProvider: React.FC<{ children: React.ReactNode }> = ({ child
       order: images.filter(img => img.column === image.column).length
     };
     
+    console.log('Adding new image:', newImage);
     setImages(prev => [...prev, newImage]);
     toast.success('Image added successfully');
   };
 
   const updateImage = (id: string, updates: Partial<Omit<GalleryImage, 'id'>>) => {
+    console.log('Updating image:', id, updates);
     setImages(prev => 
       prev.map(img => 
         img.id === id ? { ...img, ...updates } : img
@@ -141,11 +147,13 @@ export const GalleryProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const deleteImage = (id: string) => {
+    console.log('Deleting image:', id);
     setImages(prev => prev.filter(img => img.id !== id));
     toast.success('Image deleted successfully');
   };
 
   const reorderImages = (column: 1 | 2 | 3, newOrder: string[]) => {
+    console.log('Reordering images in column', column, newOrder);
     setImages(prev => {
       const columnImages = prev.filter(img => img.column === column);
       const otherImages = prev.filter(img => img.column !== column);
