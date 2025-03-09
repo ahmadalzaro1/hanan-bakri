@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import GalleryManager from '@/components/admin/GalleryManager';
 import HeroEditor from '@/components/admin/HeroEditor';
+import BatchUploader from '@/components/admin/BatchUploader';
 
 const AdminDashboard = () => {
   const { isAuthenticated, logout } = useAdmin();
@@ -45,6 +46,7 @@ const AdminDashboard = () => {
           <TabsList className="mb-8">
             <TabsTrigger value="gallery">Gallery Manager</TabsTrigger>
             <TabsTrigger value="hero">Hero Section</TabsTrigger>
+            <TabsTrigger value="batch">Batch Upload</TabsTrigger>
           </TabsList>
           
           <TabsContent value="gallery" className="bg-white p-6 rounded-md shadow-sm">
@@ -53,6 +55,10 @@ const AdminDashboard = () => {
           
           <TabsContent value="hero" className="bg-white p-6 rounded-md shadow-sm">
             <HeroEditor />
+          </TabsContent>
+
+          <TabsContent value="batch" className="bg-white p-6 rounded-md shadow-sm">
+            <BatchUploader />
           </TabsContent>
         </Tabs>
       </main>
