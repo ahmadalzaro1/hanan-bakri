@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAdmin } from '@/contexts/AdminContext';
-import { LogOut } from 'lucide-react';
+import { LogOut, Menu } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -9,9 +9,8 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
+} from "@/components/ui/sheet";
 import { ModeToggle } from '@/components/ModeToggle';
-import { Menu } from 'lucide-react';
 import { Button } from './ui/button';
 
 const Navigation = () => {
@@ -44,6 +43,7 @@ const Navigation = () => {
     { path: '/projects', label: 'Projects' },
     { path: '/about', label: 'About' },
     { path: '/contact', label: 'Contact' },
+    { path: '/book-appointment', label: 'Book Appointment' },
   ];
 
   return (

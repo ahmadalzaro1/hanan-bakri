@@ -5,7 +5,6 @@ import Footer from '@/components/Footer';
 import Hero from '@/components/home/Hero';
 import Philosophy from '@/components/home/Philosophy';
 import ParallaxGallery from '@/components/home/ParallaxGallery';
-import LoginButton from '@/components/common/LoginButton';
 
 const Index = () => {
   useEffect(() => {
@@ -19,7 +18,6 @@ const Index = () => {
   return (
     <>
       <Navigation />
-      <LoginButton />
       <main>
         <Hero />
         <ParallaxGallery />
