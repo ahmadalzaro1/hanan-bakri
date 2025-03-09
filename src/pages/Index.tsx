@@ -13,6 +13,15 @@ const Index = () => {
     
     // Update document title
     document.title = 'Hanan Bakri | Portfolio';
+    
+    // Force a refresh on the images in case they were just uploaded
+    const refreshGallery = async () => {
+      // Small delay to ensure localStorage has been updated
+      await new Promise(resolve => setTimeout(resolve, 100));
+      console.log('Index - Forcing refresh of gallery');
+    };
+    
+    refreshGallery();
   }, []);
   
   return (

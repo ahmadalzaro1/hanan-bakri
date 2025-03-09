@@ -37,84 +37,87 @@ const ParallaxGallery = () => {
   const column2Images = sortedColumnImages(2);
   const column3Images = sortedColumnImages(3);
 
-  // Debug output
-  console.log('Gallery Images:', { 
+  // Debug output to check what images we're displaying
+  console.log('ParallaxGallery - Rendering with images:', { 
     total: images.length,
     column1: column1Images.length, 
     column2: column2Images.length, 
-    column3: column3Images.length 
+    column3: column3Images.length,
+    allImages: images 
   });
 
   return (
-    <div ref={galleryRef} className="w-full min-h-screen">
-      <div className="relative grid grid-cols-1 md:grid-cols-3 gap-1 h-full">
-        {/* Column 1 - Moves Up */}
-        <div 
-          className="col-span-1 transition-transform duration-300 ease-soft" 
-          style={{ transform: `translateY(${-scrollY * 0.1}px)` }}
-        >
-          {column1Images.length > 0 ? (
-            column1Images.map((image) => (
-              <div key={`column1-${image.id}`} className="mb-1 overflow-hidden">
-                <img
-                  src={image.src}
-                  alt={image.alt}
-                  className="w-full object-cover transition-all duration-700 ease-soft hover:scale-105 h-[500px]"
-                  loading="lazy"
-                />
+    <div ref={galleryRef} className="w-full min-h-screen py-12">
+      <div className="container mx-auto">
+        <div className="relative grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
+          {/* Column 1 - Moves Up */}
+          <div 
+            className="col-span-1 transition-transform duration-300 ease-soft" 
+            style={{ transform: `translateY(${-scrollY * 0.1}px)` }}
+          >
+            {column1Images.length > 0 ? (
+              column1Images.map((image) => (
+                <div key={`column1-${image.id}`} className="mb-4 overflow-hidden rounded-lg shadow-md">
+                  <img
+                    src={image.src}
+                    alt={image.alt}
+                    className="w-full object-cover transition-all duration-700 ease-soft hover:scale-105 h-[500px]"
+                    loading="lazy"
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="h-[500px] bg-gray-100 flex items-center justify-center rounded-lg">
+                <p className="text-gray-400">No images in column 1</p>
               </div>
-            ))
-          ) : (
-            <div className="h-[500px] bg-gray-100 flex items-center justify-center">
-              <p className="text-gray-400">No images in column 1</p>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* Column 2 - Moves Down */}
-        <div 
-          className="col-span-1 transition-transform duration-300 ease-soft" 
-          style={{ transform: `translateY(${scrollY * 0.1}px)` }}
-        >
-          {column2Images.length > 0 ? (
-            column2Images.map((image) => (
-              <div key={`column2-${image.id}`} className="mb-1 overflow-hidden">
-                <img
-                  src={image.src}
-                  alt={image.alt}
-                  className="w-full object-cover transition-all duration-700 ease-soft hover:scale-105 h-[500px]"
-                  loading="lazy"
-                />
+          {/* Column 2 - Moves Down */}
+          <div 
+            className="col-span-1 transition-transform duration-300 ease-soft" 
+            style={{ transform: `translateY(${scrollY * 0.1}px)` }}
+          >
+            {column2Images.length > 0 ? (
+              column2Images.map((image) => (
+                <div key={`column2-${image.id}`} className="mb-4 overflow-hidden rounded-lg shadow-md">
+                  <img
+                    src={image.src}
+                    alt={image.alt}
+                    className="w-full object-cover transition-all duration-700 ease-soft hover:scale-105 h-[500px]"
+                    loading="lazy"
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="h-[500px] bg-gray-100 flex items-center justify-center rounded-lg">
+                <p className="text-gray-400">No images in column 2</p>
               </div>
-            ))
-          ) : (
-            <div className="h-[500px] bg-gray-100 flex items-center justify-center">
-              <p className="text-gray-400">No images in column 2</p>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* Column 3 - Moves Up */}
-        <div 
-          className="col-span-1 transition-transform duration-300 ease-soft" 
-          style={{ transform: `translateY(${-scrollY * 0.1}px)` }}
-        >
-          {column3Images.length > 0 ? (
-            column3Images.map((image) => (
-              <div key={`column3-${image.id}`} className="mb-1 overflow-hidden">
-                <img
-                  src={image.src}
-                  alt={image.alt}
-                  className="w-full object-cover transition-all duration-700 ease-soft hover:scale-105 h-[500px]"
-                  loading="lazy"
-                />
+          {/* Column 3 - Moves Up */}
+          <div 
+            className="col-span-1 transition-transform duration-300 ease-soft" 
+            style={{ transform: `translateY(${-scrollY * 0.1}px)` }}
+          >
+            {column3Images.length > 0 ? (
+              column3Images.map((image) => (
+                <div key={`column3-${image.id}`} className="mb-4 overflow-hidden rounded-lg shadow-md">
+                  <img
+                    src={image.src}
+                    alt={image.alt}
+                    className="w-full object-cover transition-all duration-700 ease-soft hover:scale-105 h-[500px]"
+                    loading="lazy"
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="h-[500px] bg-gray-100 flex items-center justify-center rounded-lg">
+                <p className="text-gray-400">No images in column 3</p>
               </div>
-            ))
-          ) : (
-            <div className="h-[500px] bg-gray-100 flex items-center justify-center">
-              <p className="text-gray-400">No images in column 3</p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

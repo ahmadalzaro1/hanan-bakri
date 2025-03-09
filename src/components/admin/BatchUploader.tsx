@@ -53,6 +53,7 @@ const BatchUploader = () => {
     try {
       // Analyze images and get column assignments
       const analysisResult = await analyzeImages(selectedFiles);
+      console.log('BatchUploader - Analysis result:', analysisResult);
       setPreviewColumns(analysisResult);
       setProgress(100);
       
@@ -77,23 +78,32 @@ const BatchUploader = () => {
     setProgress(0);
 
     try {
+      // Get current column counts for ordering
+      const columnCounts = {
+        1: images.filter(img => img.column === 1).length,
+        2: images.filter(img => img.column === 2).length,
+        3: images.filter(img => img.column === 3).length
+      };
+      
+      console.log('BatchUploader - Existing column counts:', columnCounts);
+      
       // Upload each image with its analyzed column
       for (let i = 0; i < selectedFiles.length; i++) {
         const file = selectedFiles[i];
         const column = previewColumns[i];
         
-        // Create object URL for the image
-        const imageUrl = URL.createObjectURL(file);
+        // Calculate the next order number for this column
+        const nextOrder = columnCounts[column];
+        columnCounts[column]++; // Increment for next image in same column
         
-        // Calculate proper ordering
-        const existingInColumn = images.filter(img => img.column === column).length;
+        console.log(`BatchUploader - Adding image ${i+1}/${selectedFiles.length} to column ${column} with order ${nextOrder}`);
         
         // Add to gallery with specific column and order
         addImage({
-          src: imageUrl,
+          src: previewUrls[i], // Use the already created preview URL
           alt: file.name.replace(/\.[^/.]+$/, ""), // Use filename without extension as alt text
           column: column,
-          order: existingInColumn
+          order: nextOrder
         });
         
         // Update progress

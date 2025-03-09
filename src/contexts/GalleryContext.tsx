@@ -80,7 +80,7 @@ const initialImages: GalleryImage[] = [
   },
   {
     id: '9',
-    src: 'public/lovable-uploads/1b80d65d-46ff-4e5e-a672-974b0f333440.png',
+    src: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
     alt: 'Krigor Jabotian design collection',
     column: 3,
     order: 2
@@ -98,29 +98,41 @@ export const useGallery = () => {
 export const GalleryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [images, setImages] = useState<GalleryImage[]>([]);
 
+  // Load images from localStorage on component mount
   useEffect(() => {
-    // Load images from localStorage or use initial images
-    const savedImages = localStorage.getItem('gallery_images');
-    if (savedImages) {
+    const loadImages = () => {
       try {
-        const parsedImages = JSON.parse(savedImages);
-        console.log('Loaded images from localStorage:', parsedImages.length);
-        setImages(parsedImages);
-      } catch (e) {
-        console.error('Failed to parse saved images', e);
+        const savedImages = localStorage.getItem('gallery_images');
+        if (savedImages) {
+          const parsedImages = JSON.parse(savedImages);
+          console.log('GalleryContext - Loaded images from localStorage:', parsedImages.length);
+          if (Array.isArray(parsedImages) && parsedImages.length > 0) {
+            setImages(parsedImages);
+            return;
+          }
+        }
+        // If no valid saved images, use initial images
+        console.log('GalleryContext - Using initial images');
+        setImages(initialImages);
+      } catch (error) {
+        console.error('Failed to load gallery images:', error);
         setImages(initialImages);
       }
-    } else {
-      console.log('No saved images found, using initial images');
-      setImages(initialImages);
-    }
+    };
+
+    loadImages();
   }, []);
 
   // Save images to localStorage whenever they change
   useEffect(() => {
     if (images.length > 0) {
-      console.log('Saving images to localStorage:', images.length);
-      localStorage.setItem('gallery_images', JSON.stringify(images));
+      console.log('GalleryContext - Saving images to localStorage:', images.length);
+      try {
+        localStorage.setItem('gallery_images', JSON.stringify(images));
+      } catch (error) {
+        console.error('Failed to save gallery images:', error);
+        toast.error('Failed to save gallery changes');
+      }
     }
   }, [images]);
 
@@ -128,16 +140,16 @@ export const GalleryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const newImage = {
       ...image,
       id: Date.now().toString(),
-      order: images.filter(img => img.column === image.column).length
+      order: Math.max(0, ...images.filter(img => img.column === image.column).map(img => (img.order || 0) + 1))
     };
     
-    console.log('Adding new image:', newImage);
+    console.log('GalleryContext - Adding new image:', newImage);
     setImages(prev => [...prev, newImage]);
     toast.success('Image added successfully');
   };
 
   const updateImage = (id: string, updates: Partial<Omit<GalleryImage, 'id'>>) => {
-    console.log('Updating image:', id, updates);
+    console.log('GalleryContext - Updating image:', id, updates);
     setImages(prev => 
       prev.map(img => 
         img.id === id ? { ...img, ...updates } : img
@@ -147,13 +159,13 @@ export const GalleryProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const deleteImage = (id: string) => {
-    console.log('Deleting image:', id);
+    console.log('GalleryContext - Deleting image:', id);
     setImages(prev => prev.filter(img => img.id !== id));
     toast.success('Image deleted successfully');
   };
 
   const reorderImages = (column: 1 | 2 | 3, newOrder: string[]) => {
-    console.log('Reordering images in column', column, newOrder);
+    console.log('GalleryContext - Reordering images in column', column, newOrder);
     setImages(prev => {
       const columnImages = prev.filter(img => img.column === column);
       const otherImages = prev.filter(img => img.column !== column);
@@ -168,6 +180,11 @@ export const GalleryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
     toast.success('Images reordered successfully');
   };
+
+  // Log current images whenever they change (debug only)
+  useEffect(() => {
+    console.log('GalleryContext - Current images:', images);
+  }, [images]);
 
   return (
     <GalleryContext.Provider value={{ images, addImage, updateImage, deleteImage, reorderImages }}>

@@ -8,6 +8,8 @@
 export const analyzeImages = async (files: File[]): Promise<(1 | 2 | 3)[]> => {
   const results: (1 | 2 | 3)[] = [];
   
+  console.log('imageAnalysis - Starting analysis of', files.length, 'images');
+  
   // First pass: analyze each image individually
   const imageAnalysisData = await Promise.all(
     files.map(async (file) => {
@@ -26,6 +28,8 @@ export const analyzeImages = async (files: File[]): Promise<(1 | 2 | 3)[]> => {
       };
     })
   );
+  
+  console.log('imageAnalysis - Completed initial image analysis');
   
   // Perform initial column assignments
   for (const data of imageAnalysisData) {
@@ -64,85 +68,126 @@ export const analyzeImages = async (files: File[]): Promise<(1 | 2 | 3)[]> => {
     results.push(column);
   }
   
-  // Ensure even distribution between columns - improve this logic
-  const columnCounts = [0, 0, 0]; // indices 0, 1, 2 for columns 1, 2, 3
-  results.forEach(column => columnCounts[column - 1]++);
+  console.log('imageAnalysis - Initial column assignments:', {
+    column1: results.filter(col => col === 1).length,
+    column2: results.filter(col => col === 2).length, 
+    column3: results.filter(col => col === 3).length
+  });
   
-  // If any column has significantly fewer images, move some over
-  if (files.length >= 3) {
-    // Look for severe imbalances (one column having 0 images when others have multiple)
-    const emptyColumns = columnCounts.map((count, index) => count === 0 ? index + 1 : null).filter(Boolean) as (1 | 2 | 3)[];
+  // Ensure even distribution between columns - improved logic
+  const adjustColumnDistribution = () => {
+    // Count images in each column
+    const columnCounts = [
+      results.filter(col => col === 1).length, 
+      results.filter(col => col === 2).length, 
+      results.filter(col => col === 3).length
+    ];
     
-    if (emptyColumns.length > 0) {
-      // Find the column with most images
-      const maxCountIndex = columnCounts.indexOf(Math.max(...columnCounts));
-      const overloadedColumn = (maxCountIndex + 1) as 1 | 2 | 3;
-      
-      // Move at least one image to each empty column
-      for (const emptyColumn of emptyColumns) {
-        for (let i = 0; i < results.length; i++) {
-          if (results[i] === overloadedColumn) {
-            // Move this image
-            results[i] = emptyColumn;
-            
-            // Update our counts
-            columnCounts[overloadedColumn - 1]--;
-            columnCounts[emptyColumn - 1]++;
+    // Calculate target count for even distribution
+    const totalImages = results.length;
+    const targetPerColumn = Math.floor(totalImages / 3);
+    const remainder = totalImages % 3;
+    
+    const targetCounts = [
+      targetPerColumn + (remainder > 0 ? 1 : 0),
+      targetPerColumn + (remainder > 1 ? 1 : 0),
+      targetPerColumn
+    ];
+    
+    console.log('imageAnalysis - Target distribution:', targetCounts);
+    
+    // Find columns that need adjustment
+    const overloadedColumns: number[] = [];
+    const underfilledColumns: number[] = [];
+    
+    columnCounts.forEach((count, index) => {
+      const targetCount = targetCounts[index];
+      if (count > targetCount) {
+        overloadedColumns.push(index + 1);
+      } else if (count < targetCount) {
+        underfilledColumns.push(index + 1);
+      }
+    });
+    
+    console.log('imageAnalysis - Adjustment needed:', {
+      overloaded: overloadedColumns,
+      underfilled: underfilledColumns
+    });
+    
+    // Move images from overloaded to underfilled columns
+    if (overloadedColumns.length > 0 && underfilledColumns.length > 0) {
+      for (let underCol of underfilledColumns) {
+        const needed = targetCounts[underCol - 1] - columnCounts[underCol - 1];
+        if (needed <= 0) continue;
+        
+        for (let overCol of overloadedColumns) {
+          const excess = columnCounts[overCol - 1] - targetCounts[overCol - 1];
+          if (excess <= 0) continue;
+          
+          let moved = 0;
+          // Find images to move
+          for (let i = 0; i < results.length && moved < Math.min(needed, excess); i++) {
+            if (results[i] === overCol) {
+              // Skip images that strongly prefer their current column
+              const imageData = imageAnalysisData[i];
+              
+              // Skip very wide images in column 2 or bright images in outer columns
+              if ((overCol === 2 && imageData.aspectRatio > 1.3) ||
+                  ((overCol === 1 || overCol === 3) && imageData.brightness > 170)) {
+                continue;
+              }
+              
+              // Move this image to the underfilled column
+              results[i] = underCol as 1 | 2 | 3;
+              moved++;
+              
+              // Update our counts
+              columnCounts[overCol - 1]--;
+              columnCounts[underCol - 1]++;
+            }
+          }
+        }
+      }
+    }
+    
+    // Final check - ensure no column is empty
+    const finalCounts = [
+      results.filter(col => col === 1).length, 
+      results.filter(col => col === 2).length, 
+      results.filter(col => col === 3).length
+    ];
+    
+    for (let i = 0; i < 3; i++) {
+      if (finalCounts[i] === 0 && totalImages >= 3) {
+        // Find column with most images
+        const maxColIndex = finalCounts.indexOf(Math.max(...finalCounts));
+        
+        // Move one image
+        for (let j = 0; j < results.length; j++) {
+          if (results[j] === maxColIndex + 1) {
+            results[j] = (i + 1) as 1 | 2 | 3;
             break;
           }
         }
       }
     }
-    
-    // Check for general imbalance
-    const maxCount = Math.max(...columnCounts);
-    const minCount = Math.min(...columnCounts);
-    
-    if (maxCount - minCount > 1) {
-      // Find which column has too many and which has too few
-      const overloadedColumnIndex = columnCounts.indexOf(maxCount);
-      const underfilledColumnIndex = columnCounts.indexOf(minCount);
-      
-      // Convert to 1-based column numbers
-      const overloadedColumn = (overloadedColumnIndex + 1) as 1 | 2 | 3;
-      const underfilledColumn = (underfilledColumnIndex + 1) as 1 | 2 | 3;
-      
-      // Calculate how many images to move
-      const imagesToMove = Math.floor((maxCount - minCount) / 2);
-      
-      // Look through results and find candidates to move
-      let moved = 0;
-      for (let i = 0; i < results.length && moved < imagesToMove; i++) {
-        if (results[i] === overloadedColumn) {
-          // Don't move images that strongly prefer their current column
-          const imageData = imageAnalysisData[i];
-          
-          // Skip very wide images in column 2 or bright images in outer columns
-          if ((overloadedColumn === 2 && imageData.aspectRatio > 1.3) ||
-              ((overloadedColumn === 1 || overloadedColumn === 3) && imageData.brightness > 170)) {
-            continue;
-          }
-          
-          // Move this image to the underfilled column
-          results[i] = underfilledColumn;
-          moved++;
-          
-          // Update our counts
-          columnCounts[overloadedColumnIndex]--;
-          columnCounts[underfilledColumnIndex]++;
-        }
-      }
-    }
+  };
+  
+  // Apply distribution adjustments
+  if (files.length >= 3) {
+    adjustColumnDistribution();
   }
   
   // Add a delay to simulate complex analysis and show the progress bar
   await new Promise(resolve => setTimeout(resolve, 1500));
   
-  console.log("Final column distribution:", {
+  const finalDistribution = {
     column1: results.filter(col => col === 1).length,
     column2: results.filter(col => col === 2).length, 
     column3: results.filter(col => col === 3).length
-  });
+  };
+  
+  console.log("imageAnalysis - Final column distribution:", finalDistribution);
   
   return results;
 };
