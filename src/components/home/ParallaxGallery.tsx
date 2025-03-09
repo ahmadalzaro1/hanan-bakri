@@ -1,74 +1,12 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-
-type GalleryImage = {
-  id: string;
-  src: string;
-  alt: string;
-  column: 1 | 2 | 3;
-};
-
-const galleryImages: GalleryImage[] = [
-  {
-    id: '1',
-    src: 'https://images.unsplash.com/photo-1529154691717-3306083d869e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-    alt: 'Fashion design piece with flowing red fabric',
-    column: 1,
-  },
-  {
-    id: '2',
-    src: 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-    alt: 'Elegant white gown with detailed stitching',
-    column: 2,
-  },
-  {
-    id: '3',
-    src: 'https://images.unsplash.com/photo-1495385794356-15371f348c31?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-    alt: 'Deep red dress with structural design',
-    column: 3,
-  },
-  {
-    id: '4',
-    src: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-    alt: 'Dramatic dress with flowing fabric',
-    column: 1,
-  },
-  {
-    id: '5',
-    src: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-    alt: 'Minimalist white design with intricate details',
-    column: 2,
-  },
-  {
-    id: '6',
-    src: 'https://images.unsplash.com/photo-1456885284447-7dd4bb8720bf?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-    alt: 'Structural piece with bold silhouette',
-    column: 3,
-  },
-  {
-    id: '7',
-    src: 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-    alt: 'Contrasting textures in design',
-    column: 1,
-  },
-  {
-    id: '8',
-    src: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?ixlib=rb-1.2.1&auto=format&fit=crop&w=1351&q=80',
-    alt: 'Elegant silhouette with detailed embroidery',
-    column: 2,
-  },
-  {
-    id: '9',
-    src: 'public/lovable-uploads/1b80d65d-46ff-4e5e-a672-974b0f333440.png',
-    alt: 'Krigor Jabotian design collection',
-    column: 3,
-  }
-];
+import { useGallery } from '@/contexts/GalleryContext';
 
 const ParallaxGallery = () => {
   const [scrollY, setScrollY] = useState(0);
   const galleryRef = useRef<HTMLDivElement>(null);
   const inViewRef = useRef(false);
+  const { images } = useGallery();
 
   // Handle scroll events
   useEffect(() => {
@@ -99,10 +37,15 @@ const ParallaxGallery = () => {
     }
   }, []);
 
-  // Get images for each column
-  const column1Images = galleryImages.filter(img => img.column === 1);
-  const column2Images = galleryImages.filter(img => img.column === 2);
-  const column3Images = galleryImages.filter(img => img.column === 3);
+  // Get images for each column, sorted by order
+  const sortedColumnImages = (column: 1 | 2 | 3) => {
+    return [...images.filter(img => img.column === column)]
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
+  };
+
+  const column1Images = sortedColumnImages(1);
+  const column2Images = sortedColumnImages(2);
+  const column3Images = sortedColumnImages(3);
 
   return (
     <div ref={galleryRef} className="w-full min-h-screen">
