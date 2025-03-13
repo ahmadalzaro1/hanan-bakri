@@ -28,7 +28,7 @@ const Philosophy = () => {
   }, []);
   
   return (
-    <section className="py-24 bg-secondary/50">
+    <section className="py-24 bg-muted">
       <div className="page-container">
         <div 
           ref={sectionRef}
