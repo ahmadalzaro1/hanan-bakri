@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -79,13 +78,6 @@ const About = () => {
                   art—Hanan's work reflects a sophisticated understanding of design principles while 
                   embracing modern innovations. Each project in the portfolio represents a thoughtful 
                   response to client needs, site context, and cultural considerations.
-                </p>
-                
-                <p>
-                  When not immersed in design work, Hanan can be found exploring art galleries, 
-                  traveling to architectural landmarks, or experimenting with new materials and 
-                  techniques in the studio. This continuous pursuit of inspiration ensures that 
-                  each new design remains fresh, relevant, and forward-thinking.
                 </p>
               </div>
             </div>
