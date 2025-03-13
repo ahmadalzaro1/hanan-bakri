@@ -17,16 +17,16 @@ const ImagePreviewGrid = ({
   
   if (previewUrls.length === 0) return null;
   
-  // Determine random heights for images to create a more dynamic layout
+  // Determine dynamic heights for images to create a more artistic layout
   const getRandomHeight = (index: number) => {
     // Use the file name as a seed for pseudo-randomness to ensure consistency
     const seed = selectedFiles[index]?.name.length || index;
-    const heights = ['h-64', 'h-80', 'h-96'];
+    const heights = ['h-64', 'h-72', 'h-80', 'h-88', 'h-96'];
     return heights[seed % heights.length];
   };
   
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[500px] overflow-y-auto p-2">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto p-2">
       {previewUrls.map((url, index) => {
         const isHovered = hoveredIndex === index;
         const height = getRandomHeight(index);
@@ -34,9 +34,13 @@ const ImagePreviewGrid = ({
         return (
           <div 
             key={`file-${index}`} 
-            className={`relative ${height} rounded-md overflow-hidden transition-transform duration-700`}
+            className={`relative ${height} rounded-md overflow-hidden transition-all duration-500`}
             onMouseEnter={() => setHoveredIndex(index)}
             onMouseLeave={() => setHoveredIndex(null)}
+            style={{
+              transform: isHovered ? 'scale(1.02)' : 'scale(1)',
+              boxShadow: isHovered ? '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' : 'none'
+            }}
           >
             <img 
               src={url} 
