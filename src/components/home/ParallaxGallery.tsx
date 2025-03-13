@@ -5,7 +5,7 @@ import { useParallaxEffect } from '@/hooks/useParallaxEffect';
 import GalleryColumn from './gallery/GalleryColumn';
 
 const ParallaxGallery = () => {
-  const { scrollY, mousePosition, inViewRef } = useParallaxEffect();
+  const { scrollY, mousePosition, inViewRef, isInView } = useParallaxEffect();
   const { images } = useGallery();
 
   // Get images for each column, sorted by order
@@ -27,7 +27,8 @@ const ParallaxGallery = () => {
             columnImages={column1Images} 
             columnNumber={1} 
             scrollY={scrollY} 
-            mousePosition={mousePosition} 
+            mousePosition={mousePosition}
+            isInView={isInView} 
           />
 
           {/* Column 2 - Middle */}
@@ -35,7 +36,8 @@ const ParallaxGallery = () => {
             columnImages={column2Images} 
             columnNumber={2} 
             scrollY={scrollY} 
-            mousePosition={mousePosition} 
+            mousePosition={mousePosition}
+            isInView={isInView}
             offset="md:mt-20" 
           />
 
@@ -44,7 +46,8 @@ const ParallaxGallery = () => {
             columnImages={column3Images} 
             columnNumber={3} 
             scrollY={scrollY} 
-            mousePosition={mousePosition} 
+            mousePosition={mousePosition}
+            isInView={isInView}
             offset="md:mt-32" 
           />
         </div>

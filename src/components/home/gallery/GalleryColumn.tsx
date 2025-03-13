@@ -8,6 +8,7 @@ interface GalleryColumnProps {
   columnNumber: 1 | 2 | 3;
   scrollY: number;
   mousePosition: { x: number; y: number };
+  isInView: boolean;
   offset?: string;
 }
 
@@ -15,7 +16,8 @@ const GalleryColumn: React.FC<GalleryColumnProps> = ({
   columnImages, 
   columnNumber, 
   scrollY, 
-  mousePosition, 
+  mousePosition,
+  isInView,
   offset = '' 
 }) => {
   return (
@@ -28,6 +30,7 @@ const GalleryColumn: React.FC<GalleryColumnProps> = ({
             index={index + (columnNumber === 2 ? 2 : columnNumber === 3 ? 4 : 0)} // Staggered offset
             scrollY={scrollY}
             mousePosition={mousePosition}
+            isInView={isInView}
           />
         ))
       ) : (
