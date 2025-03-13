@@ -1,28 +1,67 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import { X } from 'lucide-react';
 
 type ImagePreviewGridProps = {
   previewUrls: string[];
   selectedFiles: File[];
+  onRemoveImage?: (index: number) => void;
 };
 
-const ImagePreviewGrid = ({ previewUrls, selectedFiles }: ImagePreviewGridProps) => {
+const ImagePreviewGrid = ({ 
+  previewUrls, 
+  selectedFiles,
+  onRemoveImage
+}: ImagePreviewGridProps) => {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  
   if (previewUrls.length === 0) return null;
   
+  // Determine random heights for images to create a more dynamic layout
+  const getRandomHeight = (index: number) => {
+    // Use the file name as a seed for pseudo-randomness to ensure consistency
+    const seed = selectedFiles[index]?.name.length || index;
+    const heights = ['h-64', 'h-80', 'h-96'];
+    return heights[seed % heights.length];
+  };
+  
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 max-h-[250px] overflow-y-auto p-2">
-      {previewUrls.map((url, index) => (
-        <div key={`file-${index}`} className="relative aspect-[3/4] rounded-md overflow-hidden group">
-          <img 
-            src={url} 
-            alt={`Preview ${index + 1}`}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-sm p-2 text-center">
-            {selectedFiles[index]?.name}
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[500px] overflow-y-auto p-2">
+      {previewUrls.map((url, index) => {
+        const isHovered = hoveredIndex === index;
+        const height = getRandomHeight(index);
+        
+        return (
+          <div 
+            key={`file-${index}`} 
+            className={`relative ${height} rounded-md overflow-hidden transition-transform duration-700`}
+            onMouseEnter={() => setHoveredIndex(index)}
+            onMouseLeave={() => setHoveredIndex(null)}
+          >
+            <img 
+              src={url} 
+              alt={`Preview ${index + 1}`}
+              className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 ${isHovered ? 'scale-105' : ''}`}
+            />
+            
+            <div 
+              className={`absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white p-4 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
+            >
+              <p className="text-sm text-center line-clamp-2 mb-2">{selectedFiles[index]?.name}</p>
+              
+              {onRemoveImage && (
+                <button 
+                  onClick={() => onRemoveImage(index)}
+                  className="absolute top-2 right-2 rounded-full bg-black/60 p-1 hover:bg-black/80 transition-colors"
+                  aria-label="Remove image"
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

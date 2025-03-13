@@ -32,6 +32,21 @@ const BatchUploader = () => {
     }
   };
 
+  const handleRemoveImage = (index: number) => {
+    // Revoke the URL to prevent memory leaks
+    URL.revokeObjectURL(previewUrls[index]);
+    
+    // Remove the file and preview URL
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setPreviewUrls(prev => prev.filter((_, i) => i !== index));
+    
+    // If preview was showing, reset it since indexes have changed
+    if (showPreview) {
+      setShowPreview(false);
+      setPreviewColumns([]);
+    }
+  };
+
   const clearSelection = () => {
     // Clean up URLs to prevent memory leaks
     previewUrls.forEach(url => URL.revokeObjectURL(url));
@@ -127,17 +142,17 @@ const BatchUploader = () => {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card className="border-0 shadow-none bg-transparent">
+        <CardHeader className="px-0">
+          <CardTitle className="flex items-center gap-2 font-serif">
             <Sparkles size={18} />
-            Intelligent Batch Upload
+            Gallery Upload
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
+        <CardContent className="space-y-6 px-0">
+          <p className="text-muted-foreground font-light">
             Upload multiple images at once and our system will automatically analyze them and 
-            determine the best column placement based on image content and aesthetics.
+            determine the best column placement for an artistic gallery layout.
           </p>
           
           <FileUploader 
@@ -149,22 +164,10 @@ const BatchUploader = () => {
           <ImagePreviewGrid 
             previewUrls={previewUrls}
             selectedFiles={selectedFiles}
+            onRemoveImage={handleRemoveImage}
           />
-          
-          {isProcessing && (
-            <div className="mt-4">
-              <ProgressIndicator 
-                isProcessing={isProcessing}
-                progress={progress}
-                showPreview={showPreview}
-                selectedFilesLength={selectedFiles.length}
-                onAnalyzeAndPreview={analyzeAndPreview}
-                onProcessUpload={processUpload}
-              />
-            </div>
-          )}
         </CardContent>
-        <CardFooter className="flex flex-col space-y-3">
+        <CardFooter className="flex flex-col space-y-3 px-0">
           <ProgressIndicator 
             isProcessing={isProcessing}
             progress={progress}
