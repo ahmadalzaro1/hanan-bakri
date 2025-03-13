@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -101,12 +102,12 @@ const About = () => {
             className="opacity-0 translate-y-10 transition-all duration-1000 delay-700 ease-soft mt-24"
           >
             <div className="max-w-4xl mx-auto">
-              <h2 className="font-serif text-3xl mb-8 text-primary">Be Your Own Muse</h2>
-              <div className="prose-content space-y-6">
-                <p>
+              <h2 className="font-serif text-3xl md:text-4xl mb-8 text-primary border-l-4 border-primary pl-4 py-2">Be Your Own Muse</h2>
+              <div className="prose-content space-y-6 bg-muted/50 p-8 rounded-lg backdrop-blur-sm">
+                <p className="text-lg leading-relaxed">
                   Hanan, a renowned fashion designer, guides you in embracing your true identity, helping you feel comfortable and confident in your own skin. She creates a contemporary vision of romance infused with sensual elegance, capturing the effortless grace of a queen, strength paired with sensitivity.
                 </p>
-                <p>
+                <p className="text-lg leading-relaxed">
                   Through collaboration with professionals and artists, Hanan enriches the highest quality fabrics to empower women, allowing them to feel happy, powerful, and truly confident in who they are.
                 </p>
               </div>
