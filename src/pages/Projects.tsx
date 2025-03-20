@@ -1,8 +1,11 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tag, Grid, Filter, ImageIcon } from 'lucide-react';
 
 type Project = {
   id: string;
@@ -67,6 +70,12 @@ const projects: Project[] = [
 const Projects = () => {
   const headingRef = useRef<HTMLDivElement>(null);
   const projectRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [activeFilter, setActiveFilter] = useState<string>('All');
+  const categories = ['All', ...Array.from(new Set(projects.map(project => project.category)))];
+  
+  const filteredProjects = activeFilter === 'All' 
+    ? projects 
+    : projects.filter(project => project.category === activeFilter);
   
   useEffect(() => {
     // Scroll to top when component mounts
@@ -103,41 +112,83 @@ const Projects = () => {
   return (
     <>
       <Navigation />
-      <main className="pt-32 pb-24">
+      <main className="pt-32 pb-24 bg-gradient-to-b from-background to-background/95">
         <div className="page-container">
           <div 
             ref={headingRef}
-            className="opacity-0 translate-y-10 transition-all duration-1000 ease-soft mb-16"
+            className="opacity-0 translate-y-10 transition-all duration-1000 ease-soft mb-8 text-center"
           >
-            <h1 className="section-title">Projects</h1>
+            <h1 className="section-title mb-4">Our Fashion Projects</h1>
+            <p className="text-foreground/60 max-w-2xl mx-auto mb-16">
+              Discover our curated collection of fashion projects, from elegant bridal wear to casual sportswear and designer footwear.
+            </p>
+          </div>
+          
+          {/* Category Filter */}
+          <div className="flex flex-wrap justify-center gap-3 mb-16">
+            <Filter className="h-5 w-5 mr-2 text-primary" />
+            {categories.map((category) => (
+              <Button 
+                key={category}
+                variant={activeFilter === category ? "default" : "outline"}
+                size="sm"
+                onClick={() => setActiveFilter(category)}
+                className="transition-all duration-300"
+              >
+                {category === 'All' ? 'All Projects' : category}
+              </Button>
+            ))}
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((project, index) => (
-              <div
+            {filteredProjects.map((project, index) => (
+              <Card
                 key={project.id}
                 ref={(el) => (projectRefs.current[index] = el)}
-                className="opacity-0 translate-y-10 transition-all duration-1000 ease-soft project-card"
+                className="opacity-0 translate-y-10 transition-all duration-1000 ease-soft border-none overflow-hidden bg-card/50 backdrop-blur-sm hover:shadow-lg hover:shadow-primary/10"
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
-                <Link to={`/projects/${project.slug}`}>
-                  <figure className="overflow-hidden">
+                <Link to={`/projects/${project.slug}`} className="block h-full">
+                  <div className="relative overflow-hidden aspect-[4/5]">
                     <img 
                       src={project.image} 
                       alt={project.title}
-                      className="w-full h-80 object-cover project-image"
+                      className="w-full h-full object-cover transition-all duration-700 ease-soft hover:scale-105"
                     />
-                  </figure>
-                  <div className="p-6">
-                    <p className="text-sm uppercase tracking-wider text-foreground/60 mb-2">
-                      {project.category} • {project.year}
-                    </p>
-                    <h3 className="text-xl font-serif">{project.title}</h3>
+                    <div className="absolute top-4 right-4 bg-background/80 backdrop-blur-sm text-xs px-3 py-1 rounded-full">
+                      {project.year}
+                    </div>
                   </div>
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Tag className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium text-primary">{project.category}</span>
+                    </div>
+                    <h3 className="text-xl font-serif font-medium mb-3">{project.title}</h3>
+                    <div className="flex justify-between items-center mt-4">
+                      <span className="text-sm text-foreground/60">View details</span>
+                      <span className="h-8 w-8 rounded-full flex items-center justify-center bg-primary/10 text-primary">
+                        <ImageIcon className="h-4 w-4" />
+                      </span>
+                    </div>
+                  </CardContent>
                 </Link>
-              </div>
+              </Card>
             ))}
           </div>
+          
+          {filteredProjects.length === 0 && (
+            <div className="text-center py-16">
+              <p className="text-lg text-foreground/60">No projects found in this category.</p>
+              <Button 
+                variant="outline" 
+                className="mt-4"
+                onClick={() => setActiveFilter('All')}
+              >
+                View all projects
+              </Button>
+            </div>
+          )}
         </div>
       </main>
       <Footer />
