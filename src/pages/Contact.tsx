@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { useToast } from '@/hooks/use-toast';
+import { Mail, Phone, MapPin } from 'lucide-react';
 
 const Contact = () => {
   const { toast } = useToast();
@@ -157,24 +158,33 @@ const Contact = () => {
                 <div>
                   <h2 className="text-xl font-serif mb-4">Contact Information</h2>
                   <address className="not-italic space-y-4">
-                    <p className="flex flex-col">
-                      <span className="text-foreground/70">Email</span>
-                      <a href="mailto:info@hananbakri.com" className="hover:text-primary transition-colors">
-                        info@hananbakri.com
-                      </a>
+                    <p className="flex items-center gap-3">
+                      <Mail className="h-5 w-5 text-primary" />
+                      <span className="flex flex-col">
+                        <span className="text-foreground/70">Email</span>
+                        <a href="mailto:info@hananbakri.com" className="hover:text-primary transition-colors">
+                          info@hananbakri.com
+                        </a>
+                      </span>
                     </p>
                     
-                    <p className="flex flex-col">
-                      <span className="text-foreground/70">Phone</span>
-                      <a href="tel:+11234567890" className="hover:text-primary transition-colors">
-                        +1 (123) 456-7890
-                      </a>
+                    <p className="flex items-center gap-3">
+                      <Phone className="h-5 w-5 text-primary" />
+                      <span className="flex flex-col">
+                        <span className="text-foreground/70">Phone</span>
+                        <a href="tel:+962795544433" className="hover:text-primary transition-colors">
+                          +962 7 9554 4433
+                        </a>
+                      </span>
                     </p>
                     
-                    <p className="flex flex-col">
-                      <span className="text-foreground/70">Studio</span>
-                      <span>123 Design Street</span>
-                      <span>Creative City, State 12345</span>
+                    <p className="flex items-center gap-3">
+                      <MapPin className="h-5 w-5 text-primary" />
+                      <span className="flex flex-col">
+                        <span className="text-foreground/70">Studio</span>
+                        <span>Abdoun</span>
+                        <span>Amman, Jordan</span>
+                      </span>
                     </p>
                   </address>
                 </div>
