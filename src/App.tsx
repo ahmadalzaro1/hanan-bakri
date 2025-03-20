@@ -11,6 +11,7 @@ import ProjectDetail from "./pages/ProjectDetail";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import BookAppointment from "./pages/BookAppointment";
+import Accessories from "./pages/Accessories";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -32,6 +33,7 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/projects" element={<Projects />} />
                 <Route path="/projects/:slug" element={<ProjectDetail />} />
+                <Route path="/accessories" element={<Accessories />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/book-appointment" element={<BookAppointment />} />

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAdmin } from '@/contexts/AdminContext';
@@ -41,6 +42,7 @@ const Navigation = () => {
   const navItems = [
     { path: '/', label: 'Home' },
     { path: '/projects', label: 'Projects' },
+    { path: '/accessories', label: 'Accessories' },
     { path: '/about', label: 'About' },
     { path: '/contact', label: 'Contact' },
     { path: '/book-appointment', label: 'Book Appointment' },
