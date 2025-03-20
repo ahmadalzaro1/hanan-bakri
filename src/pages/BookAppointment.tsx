@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { CalendarIcon, Clock } from 'lucide-react';
 import { toast } from 'sonner';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const BookAppointment = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +18,8 @@ const BookAppointment = () => {
     date: '',
     time: '',
     message: '',
+    sizeDetails: '',
+    includeSizeDetails: false,
   });
   
   const headingRef = useRef<HTMLDivElement>(null);
@@ -58,6 +61,10 @@ const BookAppointment = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
   
+  const handleCheckboxChange = (checked: boolean) => {
+    setFormData(prev => ({ ...prev, includeSizeDetails: checked }));
+  };
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Appointment form submitted:', formData);
@@ -75,6 +82,8 @@ const BookAppointment = () => {
       date: '',
       time: '',
       message: '',
+      sizeDetails: '',
+      includeSizeDetails: false,
     });
   };
   
@@ -172,6 +181,33 @@ const BookAppointment = () => {
                 </div>
                 
                 <div className="space-y-2">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Checkbox 
+                      id="includeSizeDetails" 
+                      checked={formData.includeSizeDetails}
+                      onCheckedChange={handleCheckboxChange}
+                    />
+                    <Label 
+                      htmlFor="includeSizeDetails" 
+                      className="text-sm cursor-pointer"
+                    >
+                      Include Size Details (Optional)
+                    </Label>
+                  </div>
+                  
+                  {formData.includeSizeDetails && (
+                    <Textarea
+                      id="sizeDetails"
+                      name="sizeDetails"
+                      value={formData.sizeDetails}
+                      onChange={handleChange}
+                      placeholder="Please provide your size details here (measurements, preferred fit, etc.)"
+                      rows={3}
+                    />
+                  )}
+                </div>
+                
+                <div className="space-y-2">
                   <Label htmlFor="message">Message (Optional)</Label>
                   <Textarea
                     id="message"
@@ -209,7 +245,7 @@ const BookAppointment = () => {
                       During your appointment, you'll have the opportunity to view Hanan's portfolio in person and discuss your specific project needs.
                     </p>
                     <p>
-                      For urgent inquiries, please contact us directly at <a href="tel:+11234567890" className="text-primary">+1 (123) 456-7890</a>.
+                      For urgent inquiries, please contact us directly at <a href="tel:+962795544433" className="text-primary">+962 7 9554 4433</a>.
                     </p>
                   </div>
                 </div>
@@ -217,8 +253,8 @@ const BookAppointment = () => {
                 <div>
                   <h2 className="text-xl font-serif mb-4">Studio Location</h2>
                   <address className="not-italic space-y-1 text-muted-foreground">
-                    <p>123 Design Street</p>
-                    <p>Creative City, State 12345</p>
+                    <p>Abdoun</p>
+                    <p>Amman, Jordan</p>
                   </address>
                 </div>
                 
