@@ -5,7 +5,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tag, Filter, ImageIcon } from 'lucide-react';
+import { Tag, Filter, Heart, GlassWater, Ring, Shirt, Footprints } from 'lucide-react';
 
 type Project = {
   id: string;
@@ -14,48 +14,54 @@ type Project = {
   image: string;
   slug: string;
   year: string;
+  icon: React.ReactNode;
 };
 
 const projects: Project[] = [
   {
     id: '1',
-    title: 'Elegant Bridal Collection',
+    title: 'Wedding',
     category: 'Wedding',
     year: '2023',
     image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80',
-    slug: 'elegant-bridal-collection',
+    slug: 'wedding',
+    icon: <Heart className="h-4 w-4" />,
   },
   {
     id: '2',
-    title: 'Evening Glamour',
+    title: 'Soirée',
     category: 'Soirée',
     year: '2023',
     image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-    slug: 'evening-glamour',
+    slug: 'soiree',
+    icon: <GlassWater className="h-4 w-4" />,
   },
   {
     id: '3',
-    title: 'Celebration Attire',
+    title: 'Engagement',
     category: 'Engagement',
     year: '2022',
     image: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-    slug: 'celebration-attire',
+    slug: 'engagement',
+    icon: <Ring className="h-4 w-4" />,
   },
   {
     id: '4',
-    title: 'Modern Casual',
+    title: 'Sport Chic',
     category: 'Sport Chic',
     year: '2022',
     image: 'https://images.unsplash.com/photo-1600210492493-0946911123ea?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80',
-    slug: 'modern-casual',
+    slug: 'sport-chic',
+    icon: <Shirt className="h-4 w-4" />,
   },
   {
     id: '5',
-    title: 'Designer Footwear',
+    title: 'Shoes',
     category: 'Shoes',
     year: '2022',
     image: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-    slug: 'designer-footwear',
+    slug: 'shoes',
+    icon: <Footprints className="h-4 w-4" />,
   }
 ];
 
@@ -154,14 +160,14 @@ const Projects = () => {
                   </div>
                   <CardContent className="p-6">
                     <div className="flex items-center gap-2 mb-3">
-                      <Tag className="h-4 w-4 text-primary" />
+                      {project.icon}
                       <span className="text-sm font-medium text-primary">{project.category}</span>
                     </div>
                     <h3 className="text-xl font-serif font-medium mb-3 group-hover:text-primary transition-colors">{project.title}</h3>
                     <div className="flex justify-between items-center mt-4">
                       <span className="text-sm text-foreground/60 group-hover:text-primary transition-colors">View collection</span>
                       <span className="h-8 w-8 rounded-full flex items-center justify-center bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all">
-                        <ImageIcon className="h-4 w-4" />
+                        {project.icon}
                       </span>
                     </div>
                   </CardContent>
