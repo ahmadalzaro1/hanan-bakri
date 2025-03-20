@@ -5,7 +5,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tag, Filter, Heart, GlassWater, Ring, Shirt, Footprints } from 'lucide-react';
+import { Tag, Filter, Heart, GlassWater, Gem, Shirt, Footprints } from 'lucide-react';
 
 type Project = {
   id: string;
@@ -43,7 +43,7 @@ const projects: Project[] = [
     year: '2022',
     image: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
     slug: 'engagement',
-    icon: <Ring className="h-4 w-4" />,
+    icon: <Gem className="h-4 w-4" />,
   },
   {
     id: '4',
