@@ -5,7 +5,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tag, Grid, Filter, ImageIcon } from 'lucide-react';
+import { Tag, Filter, ImageIcon } from 'lucide-react';
 
 type Project = {
   id: string;
@@ -56,15 +56,7 @@ const projects: Project[] = [
     year: '2022',
     image: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
     slug: 'designer-footwear',
-  },
-  {
-    id: '6',
-    title: 'Luxe Wedding Collection',
-    category: 'Wedding',
-    year: '2021',
-    image: 'https://images.unsplash.com/photo-1618220048045-10a6dbdf83e0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-    slug: 'luxe-wedding-collection',
-  },
+  }
 ];
 
 const Projects = () => {
@@ -113,14 +105,14 @@ const Projects = () => {
     <>
       <Navigation />
       <main className="pt-32 pb-24 bg-gradient-to-b from-background to-background/95">
-        <div className="page-container">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div 
             ref={headingRef}
-            className="opacity-0 translate-y-10 transition-all duration-1000 ease-soft mb-8 text-center"
+            className="opacity-0 translate-y-10 transition-all duration-1000 ease-out mb-12 text-center"
           >
-            <h1 className="section-title mb-4">Our Fashion Projects</h1>
-            <p className="text-foreground/60 max-w-2xl mx-auto mb-16">
-              Discover our curated collection of fashion projects, from elegant bridal wear to casual sportswear and designer footwear.
+            <h1 className="text-4xl font-serif font-bold mb-6">Fashion Collections</h1>
+            <p className="text-foreground/60 max-w-2xl mx-auto mb-12">
+              Explore our exclusive fashion categories, featuring the latest designs in bridal wear, evening attire, and more.
             </p>
           </div>
           
@@ -135,7 +127,7 @@ const Projects = () => {
                 onClick={() => setActiveFilter(category)}
                 className="transition-all duration-300"
               >
-                {category === 'All' ? 'All Projects' : category}
+                {category === 'All' ? 'All Collections' : category}
               </Button>
             ))}
           </div>
@@ -145,7 +137,7 @@ const Projects = () => {
               <Card
                 key={project.id}
                 ref={(el) => (projectRefs.current[index] = el)}
-                className="opacity-0 translate-y-10 transition-all duration-1000 ease-soft border-none overflow-hidden bg-card/50 backdrop-blur-sm hover:shadow-lg hover:shadow-primary/10"
+                className="opacity-0 translate-y-10 transition-all duration-1000 ease-out border-none overflow-hidden bg-card/50 backdrop-blur-sm hover:shadow-xl hover:shadow-primary/20 group"
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
                 <Link to={`/projects/${project.slug}`} className="block h-full">
@@ -153,21 +145,22 @@ const Projects = () => {
                     <img 
                       src={project.image} 
                       alt={project.title}
-                      className="w-full h-full object-cover transition-all duration-700 ease-soft hover:scale-105"
+                      className="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-105"
                     />
                     <div className="absolute top-4 right-4 bg-background/80 backdrop-blur-sm text-xs px-3 py-1 rounded-full">
                       {project.year}
                     </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
                   <CardContent className="p-6">
                     <div className="flex items-center gap-2 mb-3">
                       <Tag className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium text-primary">{project.category}</span>
                     </div>
-                    <h3 className="text-xl font-serif font-medium mb-3">{project.title}</h3>
+                    <h3 className="text-xl font-serif font-medium mb-3 group-hover:text-primary transition-colors">{project.title}</h3>
                     <div className="flex justify-between items-center mt-4">
-                      <span className="text-sm text-foreground/60">View details</span>
-                      <span className="h-8 w-8 rounded-full flex items-center justify-center bg-primary/10 text-primary">
+                      <span className="text-sm text-foreground/60 group-hover:text-primary transition-colors">View collection</span>
+                      <span className="h-8 w-8 rounded-full flex items-center justify-center bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all">
                         <ImageIcon className="h-4 w-4" />
                       </span>
                     </div>
@@ -179,13 +172,13 @@ const Projects = () => {
           
           {filteredProjects.length === 0 && (
             <div className="text-center py-16">
-              <p className="text-lg text-foreground/60">No projects found in this category.</p>
+              <p className="text-lg text-foreground/60">No collections found in this category.</p>
               <Button 
                 variant="outline" 
                 className="mt-4"
                 onClick={() => setActiveFilter('All')}
               >
-                View all projects
+                View all collections
               </Button>
             </div>
           )}
